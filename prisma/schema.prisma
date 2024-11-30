@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model AuthUser{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  username String
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  emailVerify Boolean
+  role Role
+
+  UserInfo UserInfo?
+  flowers flowers[]
+}
+
+model UserInfo {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId @unique
+  firstName String
+  lastName String
+  phoneNumber String
+  current_state String
+  current_city String
+  photo_url String
+  favourite_colour String
+  bio String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  UserInfo AuthUser @relation(fields: [userId], references: [id])
+}
+
+
+model flowers {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  name String
+  price String
+  description String
+  flower_photo_url String
+  comeFrom String
+  flower_colour String
+  flower_size flower_size
+  flower_type flower_type
+  whoLoveThisFlower String
+  liked_by String[]
+  disliked_by String[]
+  review String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  UserInfo AuthUser @relation(fields: [userId], references: [id])
+}
+
+
+enum Role {
+  ADMIN
+  MODERATOR
+  USER
+  SELLER
+}
+
+enum flower_size {
+  SMALL
+  MEDIUM
+  LARGE
+  EXTRA_LARGE
+}
+
+enum flower_type {
+  ROSE
+  LILY
+  TULIP
+  DAISY
+  SUNFLOWER
+  ORCHID
+  POPPY
+  MARIGOLD
+  DAFFODIL
+  LAVENDER
+  PEONY
+  HYACINTH
+  CARNATION
+  CHRYSANTHEMUM
+  DAHLIA
+  IRIS
+  VIOLET
+  CAMELLIA
+  JASMINE
+  ZINNIA
+  FUCHSIA
+  GARDENIA
+  ANEMONE
+  LARKSPUR
+  SNAPDRAGON
+  ASTER
+  FREESIA
+  TIGER_LILY
+  BEGONIA
+  SWEET_PEA
+  BOUVARDIA
+  WISTERIA
+  CLEMATIS
+  HELLEBORE
+  BLAZING_STAR
+}
