@@ -10,6 +10,12 @@ export default {
   ],
   theme: {
     extend: {
+      backgroundColor: {
+        primary: "#246450",
+      },
+      textColor: {
+        primary: "#246450",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
