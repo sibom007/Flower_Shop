@@ -31,14 +31,14 @@ model AuthUser{
 model UserInfo {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId @unique
-  firstName String
-  lastName String
-  phoneNumber String
-  current_state String
-  current_city String
-  photo_url String
-  favourite_colour String
-  bio String
+  firstName String?
+  lastName String?
+  phoneNumber String?
+  current_state String?
+  current_city String?
+  photo_url String?
+  favourite_colour String?
+  bio String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
