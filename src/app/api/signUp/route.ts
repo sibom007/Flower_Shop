@@ -1,20 +1,10 @@
-import admin from "firebase-admin";
-
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import prisma from "@/utils/prisma";
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    }),
-  });
-}
 export async function POST(req: Request) {
   try {
+    
     const body = await req.json();
     const { email, username, password } = body;
 
@@ -24,11 +14,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
-    const userCredential = await admin.auth().createUser({
-      email: email,
-      password: password,
-    });
 
     const existUser = await prisma.authUser.findFirst({ where: { email } });
 
@@ -65,14 +50,8 @@ export async function POST(req: Request) {
       },
     });
 
-    const response = {
-      id: newUser.id,
-      email: userCredential.email,
-      username: newUser.username,
-    };
-
     return NextResponse.json(
-      { message: "User created successfully!", response },
+      { message: "User created successfully!" },
       { status: 201 }
     );
   } catch (error: unknown) {

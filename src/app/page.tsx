@@ -8,6 +8,7 @@ export default function Home() {
     gsap.from("#box", { x: 20, scale: 20, duration: 7 });
   });
 
+
   return (
     <div>
       hello

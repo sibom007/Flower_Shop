@@ -16,12 +16,20 @@ import { Button } from "@/components/ui/button";
 import { Dispatch, SetStateAction, useState } from "react";
 import useSignUp from "../hooks/useSignUp";
 import { toast } from "sonner";
+import useSignUpToDB from "../hooks/useSignUpToDB";
 
 interface SignUpPageProps {
   setIsSignUp: Dispatch<SetStateAction<boolean>>;
 }
 
 const SignUpPage = ({ setIsSignUp }: SignUpPageProps) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
+
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   useGSAP(() => {
     gsap.from("div", {
       opacity: 0,
@@ -49,33 +57,25 @@ const SignUpPage = ({ setIsSignUp }: SignUpPageProps) => {
       yoyo: true, // This makes the animation reverse back
     });
   });
+  const { mutate: signUpToDB } = useSignUpToDB();
 
   const { mutate, isPending } = useSignUp({
     onSuccess: () => {
-      setIsSignUp(false);
-      setIsLoading(false);
-      toast.success("Sign up successfully");
       setEmail("");
       setPassword("");
       setUserName("");
+      setIsSignUp(false);
+      toast.success("Sign up successfully");
+      signUpToDB({ email: email, password: password, username: userName });
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       setError("" + error);
       toast.error("Sign up failed");
     },
   });
-  console.log("🚀 ~ SignUpPage ~ isPending:", isPending);
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [userName, setUserName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = () => {
     setError("");
-    setIsLoading(true);
 
     const validateSignUp = () => {
       switch (true) {
@@ -97,12 +97,12 @@ const SignUpPage = ({ setIsSignUp }: SignUpPageProps) => {
     };
 
     const validationError = validateSignUp();
+
     if (validationError) {
       setError(validationError);
-      setIsLoading(false);
       return;
     }
-    mutate({ email, password, username: userName });
+    mutate({ email, password });
   };
 
   return (
@@ -177,8 +177,8 @@ const SignUpPage = ({ setIsSignUp }: SignUpPageProps) => {
               variant={"primary"}
               className="p-2 rounded-md hover:bg-primary/90 duration-500"
               onClick={handleSignUp}
-              disabled={isLoading}>
-              {isLoading ? (
+              disabled={isPending}>
+              {isPending ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin h-5 w-5 border-2 border-white rounded-full border-t-transparent"></div>
                   <span className="ml-2">Logging...</span>

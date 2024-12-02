@@ -1,12 +1,16 @@
 import Image from "next/image";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 
-import { FaFacebookSquare } from "react-icons/fa";
+import { FaFacebookSquare, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
+import { PiSpinnerBallLight } from "react-icons/pi";
+import useSignIn from "../hooks/useSignIn";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface SignInPageProps {
   setIsSignUp: Dispatch<SetStateAction<boolean>>;
@@ -40,6 +44,30 @@ const SignInPage = ({ setIsSignUp }: SignInPageProps) => {
       yoyo: true, // This makes the animation reverse back
     });
   });
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+
+  const { mutate, isPending } = useSignIn({
+    onSuccess: () => {
+      setEmail("");
+      setPassword("");
+      toast.success("Sign In successfully");
+      router.push("/");
+    },
+    onError: (error) => {
+      toast.error("Sign In failed");
+      setError(error instanceof Error ? error.message : String(error));
+    },
+  });
+
+  const handleSignIn = () => {
+    setError("");
+    mutate({ email, password });
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen flex items-center justify-center overflow-hidden">
@@ -77,26 +105,45 @@ const SignInPage = ({ setIsSignUp }: SignInPageProps) => {
           </h1>
 
           <div className="space-y-6 mt-10">
-            <input
-              type="text"
-              placeholder="user Name"
-              className="w-full p-2  border-2 border-green-700/20 rounded-md bg-gray-200 focus:outline-none"
-            />
+            {isPending && (
+              <p className=" absolute top-20 left-[184px] text-primary text-sm">
+                <PiSpinnerBallLight className="animate-spin text-2xl size-14" />
+              </p>
+            )}
             <input
               type="text"
               placeholder="Email"
               className="w-full p-2  border-2 border-green-700/20 rounded-md bg-gray-200 focus:outline-none"
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <input
-              type="text"
-              placeholder="Password"
-              className="w-full p-2  border-2 border-green-700/20 rounded-md bg-gray-200 focus:outline-none"
-            />
-
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className="w-full p-2 border-2 border-green-700/20 rounded-md bg-gray-200 focus:outline-none"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+              </button>
+            </div>
+            {error && <p className="text-red-500">{error}</p>}
             <Button
               variant={"primary"}
-              className="p-2 rounded-md hover:bg-primary/90 duration-500">
-              Continue
+              className="p-2 rounded-md hover:bg-primary/90 duration-500"
+              onClick={handleSignIn}
+              disabled={isPending}>
+              {isPending ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin h-5 w-5 border-2 border-white rounded-full border-t-transparent"></div>
+                  <span className="ml-2">Logging...</span>
+                </div>
+              ) : (
+                "Continue"
+              )}
             </Button>
           </div>
           <div className="mt-4 text-center flex  justify-center items-center gap-2">

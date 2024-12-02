@@ -43,16 +43,13 @@ export async function POST(req: Request) {
     }
 
     // create Token
-    const token = await admin.auth().createCustomToken(user.id);
+    const token = await admin.auth().createCustomToken(email);
 
     // make respocense for login
     const res = {
       accessToken: token,
       user: {
-        email: user.email,
-        role: user.role,
         username: user.username,
-        id: user.id,
       },
     };
 

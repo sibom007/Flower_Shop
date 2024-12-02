@@ -1,12 +1,12 @@
-import { signUpUser } from "@/action/AuthAction";
+import { signInUser } from "@/action/AuthAction";
 import { useMutation } from "@tanstack/react-query";
 
-interface SignUpCredentials {
+interface SignInCredentials {
   email: string;
   password: string;
 }
 
-const useSignUp = ({
+const useSignIn = ({
   onSuccess,
   onError,
 }: {
@@ -14,18 +14,17 @@ const useSignUp = ({
   onError: (error: unknown) => void;
 }) => {
   return useMutation({
-    mutationKey: ["signup"],
-    mutationFn: (payload: SignUpCredentials) => {
-      const res = signUpUser(payload);
+    mutationKey: ["signin"],
+    mutationFn: async (payload: SignInCredentials) => {
+      const res = await signInUser(payload);
       return res;
     },
     onSuccess: () => {
       onSuccess();
     },
-
     onError: (error: unknown) => {
       onError(error);
     },
   });
 };
-export default useSignUp;
+export default useSignIn;
